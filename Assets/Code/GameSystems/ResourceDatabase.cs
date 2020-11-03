@@ -7,8 +7,8 @@ public class ResourceDatabase : MonoBehaviour
 {
     [SerializeField] private Dictionary<string, Image> resourceImages;
 
-    public string GetImage(string resource)
+    public Image GetImage(string resource)
     {
-        return 
+        return resourceImages[resource]; 
     }
 }
