@@ -7,14 +7,6 @@ public class PathFinding : MonoBehaviour
 {
     [SerializeField] Sprite map;
     [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] List<Transform> test;
-
-    /*[SerializeField] WalkSpeeds walkSpeed;
-    [SerializeField] GameObject token;
-    [SerializeField] Color[] tradeRoutColor;
-    List<List<Vector3>> routes = new List<List<Vector3>>();
-    int c = 0;
-    int r = 0;*/
 
     private float ratio;
     private int width;
@@ -35,41 +27,7 @@ public class PathFinding : MonoBehaviour
 
         spriteRenderer.sprite = map;
         pathMap = new PathNode[width, height];
-        
-       /* for (int i = 0; i < test.Count-1; i++)
-        {
-            for (int j = i+1; j < test.Count; j++)
-            {
-                routes.Add(new List<Vector3> {test[i].position, test[j].position});
-            }
-        }*/
     }
-
-    /*private void Update()
-    {
-        
-        if (r < routes.Count)
-        {
-            List<Vector3Int> tst = PathFind(routes[r][0], routes[r][1], walkSpeed);
-
-            foreach (Vector3Int p in tst)
-            {
-                Vector3 pos = GetRealPos(p.x, p.y);
-                GameObject obj = GameObject.Instantiate(token, new Vector3(pos.x, pos.y, 0), transform.rotation, this.transform) as GameObject;
-
-                obj.GetComponent<SpriteRenderer>().color = tradeRoutColor[c];
-            }
-
-            c++;
-            if (c > tradeRoutColor.Length - 1)
-            {
-                c = 0;
-            }
-
-            r++;
-        }
-    }*/
-
 
     public List<Vector3Int> PathFind(Vector3 from, Vector3 to, WalkSpeeds walkSpeed)
     {
@@ -124,7 +82,7 @@ public class PathFinding : MonoBehaviour
                     int newG = currentNode.gCost + walkSpeed.GetSpeed((Color)(map.texture.GetPixel(ngb.Cords().x, ngb.Cords().y)), dist);
                     if (openList.Contains(ngb))
                     {
-                        if (newG < ngb.gCost || (newG == ngb.gCost && ngb.cameFromNode != null &&  CloseToCentre(ngb.Cords(), ngb.cameFromNode.Cords(),currentNode.Cords(), startNode.Cords(), endNode.Cords())))
+                        if (newG < ngb.gCost)
                         {
                             ngb.gCost = newG;
                             ngb.CalculateFValue();
@@ -188,38 +146,18 @@ public class PathFinding : MonoBehaviour
     }
     #endregion
 
-    private bool CloseToCentre(Vector2 me, Vector2 prev, Vector2 cur, Vector2 frm, Vector2 to)
-    {
-        Vector2 vOrg;
-        if (Vector2.Distance(me, frm) > Vector2.Distance(me, to))
-            vOrg = new Vector2(me.x - frm.x, me.y - frm.y);
-        else
-            vOrg = new Vector2(to.x - me.x, to.y - me.y);
-        Vector2 vMe = new Vector2(me.x - cur.x, me.y - cur.y);
-        Vector2 vPrev = new Vector2(me.x - prev.x, me.y - prev.y);
-
-        vOrg = new Vector2(vOrg.x / vOrg.magnitude, vOrg.y / vOrg.magnitude);
-        vMe = new Vector2(vMe.x / vMe.magnitude, vMe.y / vMe.magnitude);
-        vMe = new Vector2(vPrev.x / vPrev.magnitude, vPrev.y / vPrev.magnitude);
-
-        Vector2 difMe = new Vector2(vMe.x - vOrg.x, vMe.y - vOrg.y);
-        Vector2 difPrev = new Vector2(vPrev.x - vOrg.x, vPrev.y - vOrg.y);
-
-        return (vMe.magnitude < vPrev.magnitude);
-    }
-
     private int CalculateHCost(PathNode node, PathNode endNode)
     {
-        int ret = 0;
+        
         int hgt = Mathf.Abs(endNode.Cords().y - node.Cords().y);
         int wdt = Mathf.Abs(endNode.Cords().x - node.Cords().x);
-        if (wdt <= hgt)
-            ret = 10 * (wdt - hgt) + 14 * hgt;
-        else
-            ret = 10 * (hgt - wdt) + 14 * wdt;
+
+        int ret = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow(wdt, 2) + Mathf.Pow(hgt, 2))) * 10;
+
         return ret;
     }
 
+    #region Get positions
     private Vector2Int GetMapPos(Vector3 position)
     {
         int x = Mathf.RoundToInt(position.x * ratio + width / 2);
@@ -235,4 +173,5 @@ public class PathFinding : MonoBehaviour
 
         return new Vector3(newX, newY, 0);
     }
+    #endregion
 }
